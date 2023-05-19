@@ -6,4 +6,8 @@ public class Paths {
     public static class Stock {
         public static final String ServiceBasePackage = "com.kodlamaio.stockservice";
     }
+
+    public static class Filter {
+        public static final String ServiceBasePackage = "com.example.filterservice";
+    }
 }
