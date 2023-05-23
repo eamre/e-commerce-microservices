@@ -43,6 +43,7 @@ public class CategoryManager implements CategoryService {
     @Override
     public CreateCategoryResponse add(CreateCategoryRequest request) {
         var category = mapper.forRequest().map(request, Category.class);
+        category.setId(null);
         repository.save(category);
 
         var response = mapper.forResponse().map(category, CreateCategoryResponse.class);

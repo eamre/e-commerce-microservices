@@ -52,9 +52,9 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-        <groupId>org.modelmapper</groupId>
-        <artifactId>modelmapper</artifactId>
-        <version>3.1.1</version>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>3.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>

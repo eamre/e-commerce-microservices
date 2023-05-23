@@ -13,9 +13,9 @@ import java.util.UUID;
 public class GetAllFiltersResponse {
     private String id;
     private UUID productId;
-    private UUID[] categoryId;
+    private UUID[] categoryIds;
     private String productName;
-    private String[] categoryName;
+    private String[] categoryNames;
     private int unitsInStock;
     private double unitPrice;
     private String state;

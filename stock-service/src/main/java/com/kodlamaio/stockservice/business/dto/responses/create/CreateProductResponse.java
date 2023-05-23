@@ -21,4 +21,5 @@ public class CreateProductResponse {
     private double unitPrice;
     private State state;
     private String description;
+    private List<String> categoryNames;
 }

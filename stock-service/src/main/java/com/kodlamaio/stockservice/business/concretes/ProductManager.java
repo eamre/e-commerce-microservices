@@ -1,6 +1,7 @@
 package com.kodlamaio.stockservice.business.concretes;
 
-import com.kodlamaio.stockservice.entities.enums.State;
+import com.kodlamaio.commonpackage.events.stock.ProductCreatedEvent;
+import com.kodlamaio.commonpackage.kafka.producer.KafkaProducer;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.stockservice.business.abstracts.CategoryService;
 import com.kodlamaio.stockservice.business.abstracts.ProductService;
@@ -13,6 +14,7 @@ import com.kodlamaio.stockservice.business.dto.responses.get.GetProductResponse;
 import com.kodlamaio.stockservice.business.dto.responses.update.UpdateProductResponse;
 import com.kodlamaio.stockservice.entities.Category;
 import com.kodlamaio.stockservice.entities.Product;
+import com.kodlamaio.stockservice.entities.enums.State;
 import com.kodlamaio.stockservice.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,7 @@ public class ProductManager implements ProductService {
     private final ProductRepository repository;
     private final CategoryService categoryService;
     private final ModelMapperService mapper;
-
+    private final KafkaProducer producer;
     @Override
     public List<GetAllProductsResponse> getAll(boolean showInactive) {
         var products = repository.findAll();
@@ -58,10 +60,15 @@ public class ProductManager implements ProductService {
     public CreateProductResponse add(CreateProductRequest request) {
         var product = mapper.forRequest().map(request, Product.class);
         List<UUID> categoryIds = setCategoryForProduct(request.getCategoryIds(), product);
+        product.setId(null);
         repository.save(product);
 
         var response = mapper.forResponse().map(product, CreateProductResponse.class);
         response.setCategoryIds(categoryIds);
+        response.setCategoryNames(product.getCategories().stream().map(category -> category.getName()).toList());
+        var createdProduct = response;
+        sendKafkaCarCreatedEvent(createdProduct);
+
         return response;
     }
 
@@ -96,5 +103,10 @@ public class ProductManager implements ProductService {
                 .map(category -> category.getId())
                 .toList();
         return categoryList;
+    }
+
+    private void sendKafkaCarCreatedEvent(CreateProductResponse createdProduct) {
+        var event = mapper.forResponse().map(createdProduct, ProductCreatedEvent.class);
+        producer.sendMessage(event, "product-created");
     }
 }

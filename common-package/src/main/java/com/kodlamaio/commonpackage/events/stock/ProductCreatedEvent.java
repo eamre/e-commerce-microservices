@@ -1,21 +1,18 @@
-package com.example.filterservice.entities;
+package com.kodlamaio.commonpackage.events.stock;
 
+import com.kodlamaio.commonpackage.events.Event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
 
-@AllArgsConstructor
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
-@Document
-public class Filter {
-    @Id
+@AllArgsConstructor
+public class ProductCreatedEvent implements Event {
     private String id;
     private UUID productId;
     private UUID[] categoryIds;
