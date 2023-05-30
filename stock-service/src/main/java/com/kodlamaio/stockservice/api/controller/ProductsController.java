@@ -1,5 +1,6 @@
 package com.kodlamaio.stockservice.api.controller;
 
+import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
 import com.kodlamaio.stockservice.business.abstracts.ProductService;
 import com.kodlamaio.stockservice.business.dto.requests.create.CreateProductRequest;
 import com.kodlamaio.stockservice.business.dto.requests.update.UpdateProductRequest;
@@ -45,5 +46,16 @@ public class ProductsController {
     public void delete(@PathVariable UUID id) {
         service.delete(id);
     }
+
+    @GetMapping("/check-product-available/{id}")
+    public ClientResponse checkIfProductAvailable(@PathVariable UUID id) {
+        return service.checkIfProductAvailable(id);
+    }
+
+    @GetMapping("/check-product-in-stock/{id}/{requestQuantity}")
+    public ClientResponse checkIsProductInStock(@PathVariable UUID id, @PathVariable int requestQuantity) {
+        return service.checkIsProductInStock(id, requestQuantity);
+    }
+
 
 }

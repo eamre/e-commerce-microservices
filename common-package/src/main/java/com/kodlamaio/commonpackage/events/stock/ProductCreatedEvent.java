@@ -13,7 +13,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductCreatedEvent implements Event {
-    private String id;
     private UUID productId;
     private UUID[] categoryIds;
     private String productName;

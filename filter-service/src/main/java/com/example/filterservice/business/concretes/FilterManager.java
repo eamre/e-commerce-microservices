@@ -5,6 +5,7 @@ import com.example.filterservice.business.dto.responses.GetAllFiltersResponse;
 import com.example.filterservice.business.dto.responses.GetFilterResponse;
 import com.example.filterservice.entities.Filter;
 import com.example.filterservice.repository.FilterRepository;
+import com.kodlamaio.commonpackage.events.order.OrderCreatedEvent;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,5 +51,15 @@ public class FilterManager implements FilterService {
     @Override
     public void deleteByProductId(UUID productId) {
         repository.deleteByProductId(productId);
+    }
+
+    @Override
+    public void updateStock(OrderCreatedEvent event) {
+        var filter = repository.getFilterByProductId(event.getProductId());
+        filter.setUnitsInStock(filter.getUnitsInStock() - event.getRequestQuantity());
+        if(filter.getUnitsInStock()==0){
+          filter.setState("OutOfStock");
+        }
+        repository.save(filter);
     }
 }

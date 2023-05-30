@@ -1,4 +1,4 @@
-package com.kodlamaio.stockservice;
+package com.kodlamaio.orderservice;
 
 import com.kodlamaio.commonpackage.utils.constants.Paths;
 import org.springframework.boot.SpringApplication;
@@ -8,11 +8,12 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableFeignClients
 @EnableDiscoveryClient
-@SpringBootApplication(scanBasePackages = {Paths.ConfigurationBasePackage, Paths.Stock.ServiceBasePackage})
-public class StockServiceApplication {
+@SpringBootApplication(scanBasePackages = {Paths.ConfigurationBasePackage, Paths.Order.ServiceBasePackage})
+
+public class OrderServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(StockServiceApplication.class, args);
+		SpringApplication.run(OrderServiceApplication.class, args);
 	}
 
 }

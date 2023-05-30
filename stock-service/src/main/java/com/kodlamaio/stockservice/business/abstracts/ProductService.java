@@ -1,5 +1,6 @@
 package com.kodlamaio.stockservice.business.abstracts;
 
+import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
 import com.kodlamaio.stockservice.business.dto.requests.create.CreateProductRequest;
 import com.kodlamaio.stockservice.business.dto.requests.update.UpdateProductRequest;
 import com.kodlamaio.stockservice.business.dto.responses.create.CreateProductResponse;
@@ -16,4 +17,7 @@ public interface ProductService {
     CreateProductResponse add(CreateProductRequest request);
     UpdateProductResponse update(UUID id, UpdateProductRequest request);
     void delete(UUID id);
+    ClientResponse checkIfProductAvailable (UUID id);
+    ClientResponse checkIsProductInStock (UUID id, int requestQuantity);
+    void updateStock(UUID id, int requestQuantity);
 }

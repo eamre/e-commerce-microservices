@@ -10,4 +10,8 @@ public class Paths {
     public static class Filter {
         public static final String ServiceBasePackage = "com.example.filterservice";
     }
+
+    public static class Order {
+        public static final String ServiceBasePackage = "com.kodlamaio.orderservice";
+    }
 }

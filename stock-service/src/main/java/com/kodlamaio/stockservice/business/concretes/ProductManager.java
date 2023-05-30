@@ -2,6 +2,8 @@ package com.kodlamaio.stockservice.business.concretes;
 
 import com.kodlamaio.commonpackage.events.stock.ProductCreatedEvent;
 import com.kodlamaio.commonpackage.kafka.producer.KafkaProducer;
+import com.kodlamaio.commonpackage.utils.dto.ClientResponse;
+import com.kodlamaio.commonpackage.utils.exceptions.BusinessException;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.stockservice.business.abstracts.CategoryService;
 import com.kodlamaio.stockservice.business.abstracts.ProductService;
@@ -12,6 +14,7 @@ import com.kodlamaio.stockservice.business.dto.responses.get.GetAllProductsRespo
 import com.kodlamaio.stockservice.business.dto.responses.get.GetCategoryResponse;
 import com.kodlamaio.stockservice.business.dto.responses.get.GetProductResponse;
 import com.kodlamaio.stockservice.business.dto.responses.update.UpdateProductResponse;
+import com.kodlamaio.stockservice.business.rules.ProductBusinessRules;
 import com.kodlamaio.stockservice.entities.Category;
 import com.kodlamaio.stockservice.entities.Product;
 import com.kodlamaio.stockservice.entities.enums.State;
@@ -31,6 +34,7 @@ public class ProductManager implements ProductService {
     private final CategoryService categoryService;
     private final ModelMapperService mapper;
     private final KafkaProducer producer;
+    private final ProductBusinessRules rules;
     @Override
     public List<GetAllProductsResponse> getAll(boolean showInactive) {
         var products = repository.findAll();
@@ -90,6 +94,30 @@ public class ProductManager implements ProductService {
         repository.deleteById(id);
     }
 
+    @Override
+    public ClientResponse checkIfProductAvailable(UUID id) {
+        var response = new ClientResponse();
+        validateProductAvailability(id, response);
+        return response;
+    }
+
+    @Override
+    public ClientResponse checkIsProductInStock(UUID id, int requestQuantity) {
+        var response = new ClientResponse();
+        validateProductInStock(id, requestQuantity, response);
+        return response;
+    }
+
+    @Override
+    public void updateStock(UUID id, int requestQuantity) {
+        var product = repository.findById(id).orElseThrow();
+        product.setUnitsInStock(product.getUnitsInStock()-requestQuantity);
+        if(product.getUnitsInStock()==0){
+            product.setState(State.OutOfStock);
+        }
+        repository.save(product);
+    }
+
     private List<UUID> setCategoryForProduct(List<UUID> categoryIds, Product product) {
         Set<Category> categories = new HashSet<>();
         for (UUID categoryId : categoryIds) {
@@ -108,5 +136,26 @@ public class ProductManager implements ProductService {
     private void sendKafkaCarCreatedEvent(CreateProductResponse createdProduct) {
         var event = mapper.forResponse().map(createdProduct, ProductCreatedEvent.class);
         producer.sendMessage(event, "product-created");
+    }
+    private void validateProductInStock(UUID id, int requestQuantity, ClientResponse response) {
+        try {
+            rules.checkIfProductExists(id);
+            rules.checkProductInStock(id,requestQuantity);
+            response.setSuccess(true);
+        } catch (BusinessException exception) {
+            response.setSuccess(false);
+            response.setMessage(exception.getMessage());
+        }
+    }
+
+    private void validateProductAvailability(UUID id, ClientResponse response) {
+        try {
+            rules.checkIfProductExists(id);
+            rules.checkProductAvailability(id);
+            response.setSuccess(true);
+        } catch (BusinessException exception) {
+            response.setSuccess(false);
+            response.setMessage(exception.getMessage());
+        }
     }
 }

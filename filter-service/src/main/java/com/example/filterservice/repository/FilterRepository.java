@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface FilterRepository extends MongoRepository<Filter, String> {
     void deleteByProductId(UUID productId);
+    Filter getFilterByProductId(UUID productId);
 }
