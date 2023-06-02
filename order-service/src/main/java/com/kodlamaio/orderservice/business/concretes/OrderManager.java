@@ -2,6 +2,7 @@ package com.kodlamaio.orderservice.business.concretes;
 
 import com.kodlamaio.commonpackage.events.order.OrderCreatedEvent;
 import com.kodlamaio.commonpackage.kafka.producer.KafkaProducer;
+import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
 import com.kodlamaio.orderservice.business.abstracts.OrderService;
 import com.kodlamaio.orderservice.business.dto.requests.create.CreateOrderRequest;
@@ -54,6 +55,11 @@ public class OrderManager implements OrderService {
         order.setId(null);
         order.setTotalPrice(getTotalPrice(order));
         order.setSaleDate(LocalDateTime.now());
+
+        var rentalPaymentRequest = new CreateRentalPaymentRequest();
+        mapper.forRequest().map(request.getPaymentRequest(),rentalPaymentRequest);
+        rentalPaymentRequest.setPrice(order.getTotalPrice());
+        rules.ensurePaymentProcess(rentalPaymentRequest);
 
         repository.save(order);
 

@@ -1,6 +1,8 @@
 package com.kodlamaio.orderservice.business.rules;
 
+import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import com.kodlamaio.commonpackage.utils.exceptions.BusinessException;
+import com.kodlamaio.orderservice.api.clients.PaymentClient;
 import com.kodlamaio.orderservice.api.clients.ProductClient;
 import com.kodlamaio.orderservice.repository.OrderRepository;
 import lombok.AllArgsConstructor;
@@ -13,6 +15,7 @@ import java.util.UUID;
 public class OrderBusinessRules {
     private final OrderRepository repository;
     private final ProductClient productClient;
+    private final PaymentClient paymentClient;
 
     public void checkIfOrderExists(UUID id){
         if(!repository.existsById(id)){
@@ -28,6 +31,13 @@ public class OrderBusinessRules {
 
     public void ensureProductHaveEnoughStock(UUID productId, int requestQuantity){
         var response = productClient.checkIsProductInStock(productId, requestQuantity);
+        if(!response.isSuccess()){
+            throw new BusinessException(response.getMessage());
+        }
+    }
+
+    public void ensurePaymentProcess(CreateRentalPaymentRequest request){
+        var response = paymentClient.checkPaymentProcess(request);
         if(!response.isSuccess()){
             throw new BusinessException(response.getMessage());
         }
