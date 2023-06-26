@@ -1,6 +1,7 @@
 package com.kodlamaio.orderservice.business.concretes;
 
 import com.kodlamaio.commonpackage.events.order.OrderCreatedEvent;
+import com.kodlamaio.commonpackage.events.shipping.ShippingCreatedEvent;
 import com.kodlamaio.commonpackage.kafka.producer.KafkaProducer;
 import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
@@ -52,7 +53,7 @@ public class OrderManager implements OrderService {
         rules.ensureProductHaveEnoughStock(request.getProductId(), request.getQuantity());
 
         var order = mapper.forRequest().map(request, Order.class);
-        order.setId(null);
+        order.setId(UUID.randomUUID());
         order.setTotalPrice(getTotalPrice(order));
         order.setSaleDate(LocalDateTime.now());
 
@@ -61,9 +62,14 @@ public class OrderManager implements OrderService {
         rentalPaymentRequest.setPrice(order.getTotalPrice());
         rules.ensurePaymentProcess(rentalPaymentRequest);
 
-        repository.save(order);
-
+        var createdOrder = repository.save(order);
         sendKafkaOrderCreatedEvent(order.getProductId(),order.getQuantity());
+
+        ShippingCreatedEvent shippingCreatedEvent = mapper.forResponse().map(createdOrder, ShippingCreatedEvent.class);
+        shippingCreatedEvent.setFullName(request.getShippingRequest().getFullName());
+        shippingCreatedEvent.setAddress(request.getShippingRequest().getAddress());
+        shippingCreatedEvent.setOrderId(createdOrder.getId());
+        sendKafkaShippingCreatedEvent(shippingCreatedEvent);
 
         var response = mapper.forResponse().map(order,CreateOrderResponse.class);
         return response;
@@ -90,5 +96,8 @@ public class OrderManager implements OrderService {
     }
     private void sendKafkaOrderCreatedEvent(UUID carId, int requestQuantity){
         producer.sendMessage(new OrderCreatedEvent(carId, requestQuantity), "order-created");
+    }
+    private void sendKafkaShippingCreatedEvent(ShippingCreatedEvent event){
+        producer.sendMessage(event, "shipping-created");
     }
 }

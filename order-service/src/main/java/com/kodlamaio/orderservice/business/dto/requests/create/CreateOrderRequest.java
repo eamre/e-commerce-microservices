@@ -1,5 +1,6 @@
 package com.kodlamaio.orderservice.business.dto.requests.create;
 
+import com.kodlamaio.commonpackage.utils.dto.CreateShippingRequest;
 import com.kodlamaio.commonpackage.utils.dto.PaymentRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,4 +19,5 @@ public class CreateOrderRequest {
     private int quantity;
 
     private PaymentRequest paymentRequest;
+    private CreateShippingRequest shippingRequest;
 }
