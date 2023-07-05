@@ -18,6 +18,16 @@ services:
     volumes:
       - mongodb_data:/data/db
 
+  mongodb2:
+    container_name: invoicedb
+    image: mongo
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb_data2:/data/db
+
+
 volumes:
   kafka_data:
   mongodb_data:
+  mongodb_data2:

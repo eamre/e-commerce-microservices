@@ -12,7 +12,7 @@ import com.kodlamaio.stockservice.business.dto.requests.update.UpdateProductRequ
 import com.kodlamaio.stockservice.business.dto.responses.create.CreateProductResponse;
 import com.kodlamaio.stockservice.business.dto.responses.get.GetAllProductsResponse;
 import com.kodlamaio.stockservice.business.dto.responses.get.GetCategoryResponse;
-import com.kodlamaio.stockservice.business.dto.responses.get.GetProductResponse;
+import com.kodlamaio.commonpackage.utils.dto.GetProductResponse;
 import com.kodlamaio.stockservice.business.dto.responses.update.UpdateProductResponse;
 import com.kodlamaio.stockservice.business.rules.ProductBusinessRules;
 import com.kodlamaio.stockservice.entities.Category;

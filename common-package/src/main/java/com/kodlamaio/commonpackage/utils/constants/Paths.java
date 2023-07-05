@@ -22,4 +22,8 @@ public class Paths {
     public static class Shipping {
         public static final String ServiceBasePackage = "com.kodlamaio.shippingservice";
     }
+
+    public static class Invoice {
+        public static final String ServiceBasePackage = "com.kodlama.io.invoiceservice";
+    }
 }

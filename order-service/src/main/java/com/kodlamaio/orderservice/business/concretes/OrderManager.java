@@ -1,10 +1,13 @@
 package com.kodlamaio.orderservice.business.concretes;
 
+import com.kodlamaio.commonpackage.events.invoice.InvoiceCreatedEvent;
 import com.kodlamaio.commonpackage.events.order.OrderCreatedEvent;
 import com.kodlamaio.commonpackage.events.shipping.ShippingCreatedEvent;
 import com.kodlamaio.commonpackage.kafka.producer.KafkaProducer;
 import com.kodlamaio.commonpackage.utils.dto.CreateRentalPaymentRequest;
+import com.kodlamaio.commonpackage.utils.dto.GetProductResponse;
 import com.kodlamaio.commonpackage.utils.mappers.ModelMapperService;
+import com.kodlamaio.orderservice.api.clients.ProductClient;
 import com.kodlamaio.orderservice.business.abstracts.OrderService;
 import com.kodlamaio.orderservice.business.dto.requests.create.CreateOrderRequest;
 import com.kodlamaio.orderservice.business.dto.requests.update.UpdateOrderRequest;
@@ -28,6 +31,7 @@ public class OrderManager implements OrderService {
     private final ModelMapperService mapper;
     private final KafkaProducer producer;
     private final OrderBusinessRules rules;
+    private final ProductClient productClient;
     @Override
     public List<GetAllOrdersResponse> getAll() {
         var orders = repository.findAll();
@@ -71,6 +75,10 @@ public class OrderManager implements OrderService {
         shippingCreatedEvent.setOrderId(createdOrder.getId());
         sendKafkaShippingCreatedEvent(shippingCreatedEvent);
 
+        InvoiceCreatedEvent invoiceCreatedEvent = new InvoiceCreatedEvent();
+        createInvoice(order, invoiceCreatedEvent ,request);
+        sendKafkaInvoiceCreatedEvent(invoiceCreatedEvent);
+
         var response = mapper.forResponse().map(order,CreateOrderResponse.class);
         return response;
     }
@@ -97,7 +105,22 @@ public class OrderManager implements OrderService {
     private void sendKafkaOrderCreatedEvent(UUID carId, int requestQuantity){
         producer.sendMessage(new OrderCreatedEvent(carId, requestQuantity), "order-created");
     }
+
     private void sendKafkaShippingCreatedEvent(ShippingCreatedEvent event){
         producer.sendMessage(event, "shipping-created");
+    }
+
+    private void sendKafkaInvoiceCreatedEvent(InvoiceCreatedEvent event) {
+        producer.sendMessage(event, "invoice-created");
+    }
+    private void createInvoice(Order order, InvoiceCreatedEvent event, CreateOrderRequest orderRequest){
+        GetProductResponse response = productClient.getById(orderRequest.getProductId());
+
+        event.setPrice(orderRequest.getPrice());
+        event.setQuantity(orderRequest.getQuantity());
+        event.setProductName(response.getName());
+        event.setOrderDate(order.getSaleDate());
+        event.setCardHolder(orderRequest.getPaymentRequest().getCardHolder());
+        event.setTotalPrice(order.getTotalPrice());
     }
 }

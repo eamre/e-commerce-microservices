@@ -6,7 +6,7 @@ import com.kodlamaio.stockservice.business.dto.requests.create.CreateProductRequ
 import com.kodlamaio.stockservice.business.dto.requests.update.UpdateProductRequest;
 import com.kodlamaio.stockservice.business.dto.responses.create.CreateProductResponse;
 import com.kodlamaio.stockservice.business.dto.responses.get.GetAllProductsResponse;
-import com.kodlamaio.stockservice.business.dto.responses.get.GetProductResponse;
+import com.kodlamaio.commonpackage.utils.dto.GetProductResponse;
 import com.kodlamaio.stockservice.business.dto.responses.update.UpdateProductResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;

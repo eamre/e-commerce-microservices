@@ -1,6 +1,5 @@
-package com.kodlamaio.stockservice.business.dto.responses.get;
+package com.kodlamaio.commonpackage.utils.dto;
 
-import com.kodlamaio.stockservice.entities.enums.State;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,7 @@ public class GetProductResponse {
     private String name;
     private int unitsInStock;
     private double unitPrice;
-    private State state;
+    private String state;
     private String description;
     private List<String> categoryNames;
 }
